@@ -1,0 +1,74 @@
+import React, { useState } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import { Box, CircularProgress } from "@mui/material";
+
+interface RichTextEditorProps {
+  initialValue?: string;
+  onChange?: (content: string) => void;
+}
+
+const RichTextEditor: React.FC<RichTextEditorProps> = ({
+  initialValue = "",
+  onChange,
+}) => {
+  const [isReady, setIsReady] = useState(false);
+
+  return (
+    <Box sx={{ position: "relative", minHeight: 300 }}>
+      {!isReady && (
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: "background.default",
+            zIndex: 1,
+          }}
+        >
+          <CircularProgress size={24} />
+        </Box>
+      )}
+
+      <Editor
+        apiKey="8zsdvamjtediw1ulc7b29d5b0w0mxkeep88jdfmv0hdimh39"
+        init={{
+          height: 300,
+          menubar: false,
+          plugins: [
+            "advlist",
+            "autolink",
+            "lists",
+            "link",
+            "image",
+            "charmap",
+            "preview",
+            "anchor",
+            "searchreplace",
+            "visualblocks",
+            "code",
+            "fullscreen",
+            "insertdatetime",
+            "media",
+            "table",
+            "help",
+            "wordcount",
+          ],
+          toolbar:
+            "undo redo | formatselect | bold italic backcolor | " +
+            "alignleft aligncenter alignright alignjustify | " +
+            "bullist numlist outdent indent | removeformat | help",
+          branding: false,
+        }}
+        onInit={() => setIsReady(true)}
+        initialValue={initialValue}
+        onEditorChange={(newValue) => {
+          onChange?.(newValue);
+        }}
+      />
+    </Box>
+  );
+};
+
+export default RichTextEditor;

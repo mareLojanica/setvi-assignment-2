@@ -18,4 +18,8 @@ export const modalConfig: Record<ModalType, ModalConfig> = {
     title: "Create Draft",
     description: "Start a new report draft",
   },
+  "show-more": {
+    title: "Full Report Content",
+    description: "See the full content of the report",
+  },
 };

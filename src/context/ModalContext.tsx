@@ -1,11 +1,16 @@
 import { createContext, useContext } from "react";
-import type { ModalType } from "../types/enums";
-
+import type { ModalState } from "../providers/ModalProvider";
+export interface ModalPayload {
+  modalTitle?: string;
+  title?: string;
+  content?: string;
+}
 export interface ModalContextType {
-  modalType: ModalType | null;
-  openDraftModal: () => void;
-  openEditModal: () => void;
-  openSummaryModal: () => void;
+  modalState: ModalState;
+  openDraftModal: (data?: ModalPayload) => void;
+  openEditModal: (data?: ModalPayload) => void;
+  openSummaryModal: (data?: ModalPayload) => void;
+  openShowMoreModal: (data?: ModalPayload) => void;
   closeModal: () => void;
 }
 

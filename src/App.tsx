@@ -1,20 +1,23 @@
-import React, { useState } from "react";
-import MainLayout from "./Laoyuts/MainLayout";
+import MainLayout from "./Layouts/MainLayout";
 import { Typography } from "@mui/material";
 import ToolbarBar from "./components/Toolbar";
 import ResponsiveGrid from "./components/Grid";
-import ReportCard from "./components/ReportCard";
-import { reportCardData } from "./__mocks__/report.mocks";
 import { useModal } from "./context/ModalContext";
 import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import DraggableCard from "./components/DraggableCard";
-
+import { restrictToParentElement } from "@dnd-kit/modifiers";
+import { useReports } from "./context/ReportsContext";
 const App = () => {
-  const [reports, setReports] = useState(reportCardData);
   const { openEditModal, openSummaryModal } = useModal();
-
-  const onEdit = () => openEditModal();
+  const { filteredReports, setReports } = useReports();
+  const onEdit = (title: string, content: string) => {
+    openEditModal({
+      modalTitle: "Edit Report",
+      title,
+      content,
+    });
+  };
   const onSummarize = () => openSummaryModal();
 
   const reorderReports = (e: DragEndEvent) => {
@@ -43,19 +46,21 @@ const App = () => {
 
       <ToolbarBar />
 
-      <DndContext onDragEnd={reorderReports}>
-        <SortableContext items={reports.map((r) => r.id)}>
+      <DndContext
+        onDragEnd={reorderReports}
+        modifiers={[restrictToParentElement]}
+      >
+        <SortableContext items={filteredReports.map((r) => r.id)}>
           <ResponsiveGrid>
-            {reports.map(({ id, title, content }) => (
-              <DraggableCard key={id} id={id}>
-                <ReportCard
-                  id={id}
-                  title={title}
-                  content={content}
-                  onEdit={onEdit}
-                  onSummarize={onSummarize}
-                />
-              </DraggableCard>
+            {filteredReports.map(({ id, title, content }) => (
+              <DraggableCard
+                key={id}
+                id={id}
+                title={title}
+                content={content}
+                onSummarize={onSummarize}
+                onEdit={onEdit}
+              ></DraggableCard>
             ))}
           </ResponsiveGrid>
         </SortableContext>

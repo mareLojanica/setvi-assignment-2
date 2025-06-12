@@ -2,9 +2,11 @@ import React, { type FC } from "react";
 import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useModal } from "../../context/ModalContext";
+import { useReports } from "../../context/ReportsContext";
 
 const ToolbarBar: FC = () => {
   const theme = useTheme();
+  const { onFilterChange, filter } = useReports();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { openDraftModal } = useModal();
   return (
@@ -26,6 +28,8 @@ const ToolbarBar: FC = () => {
         size="small"
         fullWidth={isMobile}
         aria-label="Search reports"
+        onChange={(e) => onFilterChange(e.target.value)}
+        value={filter}
       />
 
       <Box
@@ -41,7 +45,11 @@ const ToolbarBar: FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           aria-label="Create draft report"
-          onClick={openDraftModal}
+          onClick={() =>
+            openDraftModal({
+              modalTitle: "Create a Draft version of report using OpenAi",
+            })
+          }
         >
           Create Draft
         </Button>
