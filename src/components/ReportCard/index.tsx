@@ -26,7 +26,7 @@ export interface ReportCardProps {
   id: number;
   title: string;
   content: string;
-  onEdit: (title: string, content: string) => void;
+  onEdit: (title: string, content: string, reportId: number) => void;
   onSummarize: () => void;
   isDragging: boolean;
   dragAttributes?: HTMLAttributes<HTMLElement>;
@@ -41,6 +41,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
   isDragging,
   dragAttributes,
   dragListeners,
+  id,
 }) => {
   const theme = useTheme();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -144,7 +145,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
               startIcon={<ExpandMoreIcon />}
               onClick={(e) => {
                 e.stopPropagation();
-                openShowMoreModal({ modalTitle: title, content });
+                openShowMoreModal({ modalTitle: title, content, reportId: id });
               }}
             >
               Show more
@@ -155,7 +156,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
             startIcon={<EditIcon />}
             onClick={(e) => {
               e.stopPropagation();
-              onEdit(title, content);
+              onEdit(title, content, id);
             }}
           >
             Edit

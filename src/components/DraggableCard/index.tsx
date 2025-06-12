@@ -7,7 +7,7 @@ export type DraggableCardProps = {
   title: string;
   content: string;
   onSummarize: () => void;
-  onEdit: (title: string, content: string) => void;
+  onEdit: (title: string, content: string, reportId: number) => void;
   id: number;
 };
 

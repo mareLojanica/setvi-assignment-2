@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import { createContext, useContext } from "react";
 
 interface Report {
   id: number;
@@ -9,9 +9,9 @@ interface Report {
 interface ReportsContextType {
   reports: Report[];
   filteredReports: Report[];
-  setReports: React.Dispatch<React.SetStateAction<Report[]>>;
   onFilterChange: (value: string) => void;
   filter: string;
+  isLoading: boolean;
 }
 
 export const ReportsContext = createContext<ReportsContextType | undefined>(

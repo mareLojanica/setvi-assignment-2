@@ -1,23 +1,28 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Modal, Box, Typography, IconButton, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { modalConfig } from "../../config/modalConfig";
 import type { ModalType } from "../../types/enums";
 import RichTextEditor from "../RichTextEditor";
+import { updateReport } from "../../api/reportsApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CustomModalProps {
   open: boolean;
-  type: ModalType | null;
+  type: ModalType;
   title?: string;
   content?: string;
   onClose: () => void;
   modalTitle: string;
+  reportId: number;
 }
 
 const renderModalContent = (
   type: ModalType,
-  content?: string,
-  title?: string
+  title: string,
+  content: string,
+  setTitle: (val: string) => void,
+  setContent: (val: string) => void
 ): React.ReactNode => {
   switch (type) {
     case "edit-report":
@@ -29,7 +34,8 @@ const renderModalContent = (
           </Typography>
           <input
             type="text"
-            defaultValue={title}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             style={{
               width: "100%",
               padding: "8px",
@@ -51,7 +57,7 @@ const renderModalContent = (
             <Suspense fallback={<Typography>Loading editor...</Typography>}>
               <RichTextEditor
                 initialValue={content}
-                onChange={(value: string) => console.log(value)}
+                onChange={(val) => setContent(val)}
               />
             </Suspense>
           </div>
@@ -69,7 +75,7 @@ const renderModalContent = (
             overflow: "auto",
             fontSize: 14,
           }}
-          dangerouslySetInnerHTML={{ __html: content ?? "" }}
+          dangerouslySetInnerHTML={{ __html: content }}
           aria-label={`${title} content`}
         />
       );
@@ -78,11 +84,12 @@ const renderModalContent = (
       return null;
   }
 };
+
 const renderModalFooter = (
   type: ModalType,
   onClose: () => void,
   onSave?: () => void
-) => {
+): React.ReactNode => {
   switch (type) {
     case "edit-report":
     case "create-draft":
@@ -96,7 +103,6 @@ const renderModalFooter = (
           </Button>
         </Box>
       );
-
     case "create-summary":
     case "show-more":
       return (
@@ -106,7 +112,6 @@ const renderModalFooter = (
           </Button>
         </Box>
       );
-
     default:
       return null;
   }
@@ -116,12 +121,41 @@ const CustomModal: React.FC<CustomModalProps> = ({
   open,
   type,
   onClose,
-  content,
-  title,
+  content = "",
+  title = "",
   modalTitle,
+  reportId,
 }) => {
+  const [editableTitle, setEditableTitle] = useState(title);
+  const [editableContent, setEditableContent] = useState(content);
+  const { description } = modalConfig?.[type] ?? "";
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (open) {
+      setEditableTitle(title);
+      setEditableContent(content);
+    }
+  }, [open, title, content]);
+
+  const handleSave = async () => {
+    if (type === "edit-report") {
+      try {
+        await updateReport({
+          id: reportId,
+          title: editableTitle,
+          content: editableContent,
+        });
+
+        queryClient.invalidateQueries({ queryKey: ["reports"] });
+
+        onClose();
+      } catch (err) {
+        console.error("Failed to update report", err);
+      }
+    }
+  };
+
   if (!type) return null;
-  const { description } = modalConfig[type];
 
   return (
     <Modal
@@ -155,12 +189,22 @@ const CustomModal: React.FC<CustomModalProps> = ({
           <Typography id="modal-title" variant="h6" component="h2">
             {modalTitle}
           </Typography>
-          <IconButton onClick={onClose} aria-label="Close modal" sx={{ ml: 2 }}>
+          <IconButton onClick={onClose} aria-label="Close modal">
             <CloseIcon />
           </IconButton>
         </Box>
-        <Box mt={2}>{renderModalContent(type, content, title)}</Box>
-        {renderModalFooter(type, onClose)}
+
+        <Box mt={2}>
+          {renderModalContent(
+            type,
+            editableTitle,
+            editableContent,
+            setEditableTitle,
+            setEditableContent
+          )}
+        </Box>
+
+        {renderModalFooter(type, onClose, handleSave)}
       </Box>
     </Modal>
   );

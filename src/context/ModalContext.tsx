@@ -4,6 +4,7 @@ export interface ModalPayload {
   modalTitle?: string;
   title?: string;
   content?: string;
+  reportId: number;
 }
 export interface ModalContextType {
   modalState: ModalState;

@@ -11,11 +11,12 @@ import { useReports } from "./context/ReportsContext";
 const App = () => {
   const { openEditModal, openSummaryModal } = useModal();
   const { filteredReports, setReports } = useReports();
-  const onEdit = (title: string, content: string) => {
+  const onEdit = (title: string, content: string, reportId: number) => {
     openEditModal({
       modalTitle: "Edit Report",
       title,
       content,
+      reportId,
     });
   };
   const onSummarize = () => openSummaryModal();

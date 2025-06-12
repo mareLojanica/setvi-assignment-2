@@ -38,7 +38,7 @@ export const ModalProvider: FC<PropsWithChildren> = ({ children }) => {
       }}
     >
       {children}
-      {modalState && (
+      {modalState?.data && (
         <CustomModal
           open={!!modalState?.type}
           type={modalState.type}
@@ -46,6 +46,7 @@ export const ModalProvider: FC<PropsWithChildren> = ({ children }) => {
           title={modalState.data?.title}
           content={modalState.data?.content}
           onClose={closeModal}
+          reportId={modalState.data?.reportId}
         />
       )}
     </ModalContext.Provider>
