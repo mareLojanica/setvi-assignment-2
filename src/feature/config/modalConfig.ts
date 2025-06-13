@@ -1,9 +1,5 @@
-import type { ModalType } from "../types/enums";
+import type { ModalConfig, ModalType } from "../../types/types";
 
-interface ModalConfig {
-  title: string;
-  description?: string;
-}
 
 export const modalConfig: Record<ModalType, ModalConfig> = {
   "edit-report": {
@@ -21,5 +17,9 @@ export const modalConfig: Record<ModalType, ModalConfig> = {
   "show-more": {
     title: "Full Report Content",
     description: "See the full content of the report",
+  },
+  "create-new-report": {
+    title: "Create New Report",
+    description: "Create a new report from scratch",
   },
 };

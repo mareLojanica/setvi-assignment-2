@@ -1,42 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash";
-import { reportCardData } from "../__mocks__/report.mocks";
 import { ReportsContext } from "../context/ReportsContext";
 import { useGetReports } from "../hooks/useReportsApi";
+
+import type { DragEndEvent } from "@dnd-kit/core";
+import { reorderItemsById } from "../utils/dnd.utils";
+import type { Report } from "../types/types";
 
 export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { data: reports = [], isLoading: isLoadingGetReports } =
+  const { data: initialReports = [], isLoading: isLoadingGetReports } =
     useGetReports();
+
+  const [reports, setReports] = useState<Report[]>(initialReports);
   const [filter, setFilter] = useState("");
-  const [filteredReports, setFilteredReports] = useState(reportCardData);
+  const [filteredReports, setFilteredReports] =
+    useState<Report[]>(initialReports);
+
+  const reorderReports = useCallback(
+    (e: DragEndEvent) => {
+      if (!e.over || e.active.id === e.over.id) return;
+
+      setFilteredReports((prev) =>
+        reorderItemsById(prev, e.active.id, e.over!.id)
+      );
+    },
+    [setFilteredReports]
+  );
+  useEffect(() => {
+    setReports(initialReports);
+    setFilteredReports(initialReports);
+  }, [initialReports]);
+
+  const debouncedFilterReports = useMemo(
+    () =>
+      debounce((value: string, allReports: Report[]) => {
+        const lower = value.toLowerCase();
+        const filtered = allReports.filter((r) =>
+          r.title.toLowerCase().includes(lower)
+        );
+        setFilteredReports(filtered);
+      }, 300),
+    []
+  );
 
   useEffect(() => {
-    const debouncedFilter = debounce(() => {
-      const lower = filter.toLowerCase();
-      const result = reports.filter((r) =>
-        r.title.toLowerCase().includes(lower)
-      );
-      setFilteredReports(result);
-    }, 300);
-
-    debouncedFilter();
-
+    debouncedFilterReports(filter, reports);
     return () => {
-      debouncedFilter.cancel();
+      debouncedFilterReports.cancel();
     };
-  }, [filter, reports]);
+  }, [filter, reports, debouncedFilterReports]);
 
   const onFilterChange = (value: string) => {
     setFilter(value);
   };
-  const isLoading = isLoadingGetReports;
+
+  const value = useMemo(
+    () => ({
+      reports,
+      filteredReports,
+      onFilterChange,
+      filter,
+      isLoading: isLoadingGetReports,
+      setFilteredReports,
+      reorderReports,
+    }),
+    [reports, filteredReports, filter, isLoadingGetReports, reorderReports]
+  );
+
   return (
-    <ReportsContext.Provider
-      value={{ reports, filteredReports, onFilterChange, filter, isLoading }}
-    >
-      {children}
-    </ReportsContext.Provider>
+    <ReportsContext.Provider value={value}>{children}</ReportsContext.Provider>
   );
 };

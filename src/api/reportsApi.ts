@@ -1,16 +1,14 @@
-// src/api/reports.ts
 import { api } from "./apiClient";
 import { ENDPOINTS } from "../constants/endpoints";
+import type { Report } from "../types/types";
 
-export interface Report {
-  id: number;
-  title: string;
-  content: string;
-}
 
 export const getReports = async (): Promise<Report[]> => {
   const { data } = await api.get(ENDPOINTS.REPORTS);
-  return data;
+  return data.sort(
+    (a: Report, b: Report) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
 };
 
 export const createReport = async (report: Omit<Report, "id">) => {
@@ -18,13 +16,13 @@ export const createReport = async (report: Omit<Report, "id">) => {
   return data;
 };
 
-export const updateReport = async (report: Report) => {
-  const { data } = await api.put(ENDPOINTS.REPORT_BY_ID(report.id), report);
+export const updateReport = async (report: Omit<Report, 'timestamp'>) => {
+  const { data } = await api.patch(ENDPOINTS.REPORT_BY_ID(report.id), report);
   return data;
 };
 
 export const patchReport = async (
-  id: number,
+  id: string,
   fields: Partial<Omit<Report, "id">>
 ) => {
   const { data } = await api.patch(ENDPOINTS.REPORT_BY_ID(id), fields);

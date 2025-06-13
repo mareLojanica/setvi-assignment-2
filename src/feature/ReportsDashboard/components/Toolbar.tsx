@@ -1,14 +1,14 @@
 import React, { type FC } from "react";
 import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { useModal } from "../../context/ModalContext";
-import { useReports } from "../../context/ReportsContext";
+import { useReports } from "../../../context/ReportsContext";
+import { useModal } from "../../../context/ModalContext";
 
 const ToolbarBar: FC = () => {
   const theme = useTheme();
   const { onFilterChange, filter } = useReports();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { openDraftModal } = useModal();
+  const { openDraftModal, openCreateNewReportModal } = useModal();
   return (
     <Box
       role="search"
@@ -30,6 +30,7 @@ const ToolbarBar: FC = () => {
         aria-label="Search reports"
         onChange={(e) => onFilterChange(e.target.value)}
         value={filter}
+        sx={{ width: { sm: "35%" } }}
       />
 
       <Box
@@ -37,14 +38,28 @@ const ToolbarBar: FC = () => {
           display: "flex",
           gap: 1,
           flexWrap: "wrap",
-          justifyContent: isMobile ? "center" : "flex-end",
+          justifyContent: isMobile ? "flex-start" : "flex-end",
           width: isMobile ? "100%" : "auto",
         }}
       >
         <Button
           variant="contained"
           startIcon={<AddIcon />}
+          aria-label="Create new report"
+          sx={{ width: isMobile ? "100%" : "auto" }}
+          onClick={() =>
+            openCreateNewReportModal({
+              modalTitle: "Create a new report ",
+            })
+          }
+        >
+          Create New Report
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
           aria-label="Create draft report"
+          sx={{ width: isMobile ? "100%" : "auto" }}
           onClick={() =>
             openDraftModal({
               modalTitle: "Create a Draft version of report using OpenAi",

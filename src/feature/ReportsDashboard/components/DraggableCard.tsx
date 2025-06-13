@@ -1,15 +1,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import React, { memo, type FC } from "react";
 import { CSS } from "@dnd-kit/utilities";
-import ReportCard from "../ReportCard";
-
-export type DraggableCardProps = {
-  title: string;
-  content: string;
-  onSummarize: () => void;
-  onEdit: (title: string, content: string, reportId: number) => void;
-  id: number;
-};
+import { Box } from "@mui/material";
+import ReportCard from "./ReportCard";
+import type { DraggableCardProps } from "../../../types/types";
 
 const DraggableCard: FC<DraggableCardProps> = ({
   id,
@@ -24,14 +18,20 @@ const DraggableCard: FC<DraggableCardProps> = ({
   const isDragging = active?.id === id;
 
   return (
-    <article
+    <Box
+      component={"article"}
       ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
         transition: transition ?? undefined,
         touchAction: "manipulation",
         zIndex: isDragging ? 1000 : "auto",
+        cursor: isDragging ? "grabbing" : "grab",
+        boxShadow: isDragging ? "0 4px 20px rgba(0,0,0,0.2)" : "none",
+        opacity: isDragging ? 0.95 : 1,
       }}
+      {...attributes}
+      {...listeners}
     >
       <ReportCard
         id={id}
@@ -39,11 +39,8 @@ const DraggableCard: FC<DraggableCardProps> = ({
         content={content}
         onEdit={onEdit}
         onSummarize={onSummarize}
-        isDragging={isDragging}
-        dragAttributes={attributes}
-        dragListeners={listeners}
       />
-    </article>
+    </Box>
   );
 };
 

@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+
 import { ThemeProvider } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { theme } from "./theme";
-import { ModalProvider } from "./providers/ModalProvider";
+import App from "./App";
+import "normalize.css";
 import { ReportsProvider } from "./providers/ReportsProvider";
+import { ModalProvider } from "./providers/ModalProvider";
 
 const queryClient = new QueryClient();
 

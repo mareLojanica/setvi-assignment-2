@@ -1,16 +1,12 @@
 import React, { useState, type FC, type PropsWithChildren } from "react";
-import { ModalContext, type ModalPayload } from "../context/ModalContext";
-import type { ModalType } from "../types/enums";
-import { ModalType as ModalKeys } from "../types/enums";
-
-import CustomModal from "../components/CustomModal";
-export type ModalState = {
-  type: ModalType | null;
-  data?: ModalPayload;
-} | null;
+import { ModalContext } from "../context/ModalContext";
+import type { ModalPayload, ModalState } from "../types/types";
+import { ModalType as ModalKeys } from "../types/types";
+import ReportModals from "../feature/ReportsDashboard/components/ReportModals";
 
 export const ModalProvider: FC<PropsWithChildren> = ({ children }) => {
   const [modalState, setModalState] = useState<ModalState>({ type: null });
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
 
   const closeModal = () => setModalState({ type: null });
 
@@ -26,20 +22,41 @@ export const ModalProvider: FC<PropsWithChildren> = ({ children }) => {
   const openShowMoreModal = (data?: ModalPayload) =>
     setModalState({ type: ModalKeys.ShowMore, data });
 
+  const openCreateNewReportModal = (data?: ModalPayload) =>
+    setModalState({ type: ModalKeys.CreateNewReport, data });
+
+  const setModalContent = (content: string) => {
+    setModalState((prev) =>
+      prev?.data
+        ? {
+            ...prev,
+            data: {
+              ...prev.data,
+              content,
+            },
+          }
+        : prev
+    );
+  };
+
   return (
     <ModalContext.Provider
       value={{
         modalState,
+        closeModal,
         openDraftModal,
         openEditModal,
         openSummaryModal,
         openShowMoreModal,
-        closeModal,
+        openCreateNewReportModal,
+        isSummaryLoading,
+        setModalContent,
+        setIsSummaryLoading,
       }}
     >
       {children}
-      {modalState?.data && (
-        <CustomModal
+      {modalState?.data && modalState?.type && (
+        <ReportModals
           open={!!modalState?.type}
           type={modalState.type}
           modalTitle={modalState.data?.modalTitle ?? ""}

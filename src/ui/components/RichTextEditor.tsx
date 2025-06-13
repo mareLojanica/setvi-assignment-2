@@ -1,11 +1,7 @@
-import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Box, CircularProgress } from "@mui/material";
-
-interface RichTextEditorProps {
-  initialValue?: string;
-  onChange?: (content: string) => void;
-}
+import { useState } from "react";
+import type { RichTextEditorProps } from "../../types/types";
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   initialValue = "",
@@ -61,11 +57,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             "bullist numlist outdent indent | removeformat | help",
           branding: false,
         }}
-        onInit={() => setIsReady(true)}
-        initialValue={initialValue}
+        onInit={() => {
+          setIsReady(true);
+          onChange(initialValue);
+        }}
         onEditorChange={(newValue) => {
           onChange?.(newValue);
         }}
+        value={initialValue}
       />
     </Box>
   );

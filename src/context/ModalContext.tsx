@@ -1,19 +1,5 @@
 import { createContext, useContext } from "react";
-import type { ModalState } from "../providers/ModalProvider";
-export interface ModalPayload {
-  modalTitle?: string;
-  title?: string;
-  content?: string;
-  reportId: number;
-}
-export interface ModalContextType {
-  modalState: ModalState;
-  openDraftModal: (data?: ModalPayload) => void;
-  openEditModal: (data?: ModalPayload) => void;
-  openSummaryModal: (data?: ModalPayload) => void;
-  openShowMoreModal: (data?: ModalPayload) => void;
-  closeModal: () => void;
-}
+import type { ModalContextType } from "../types/types";
 
 export const ModalContext = createContext<ModalContextType | undefined>(
   undefined

@@ -1,18 +1,5 @@
 import { createContext, useContext } from "react";
-
-interface Report {
-  id: number;
-  title: string;
-  content: string;
-}
-
-interface ReportsContextType {
-  reports: Report[];
-  filteredReports: Report[];
-  onFilterChange: (value: string) => void;
-  filter: string;
-  isLoading: boolean;
-}
+import type { ReportsContextType } from "../types/types";
 
 export const ReportsContext = createContext<ReportsContextType | undefined>(
   undefined
