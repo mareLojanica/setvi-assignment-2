@@ -9,8 +9,7 @@ const DraggableCard: FC<DraggableCardProps> = ({
   id,
   title,
   content,
-  onEdit,
-  onSummarize,
+  isDraft,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
@@ -33,13 +32,7 @@ const DraggableCard: FC<DraggableCardProps> = ({
       {...attributes}
       {...listeners}
     >
-      <ReportCard
-        id={id}
-        title={title}
-        content={content}
-        onEdit={onEdit}
-        onSummarize={onSummarize}
-      />
+      <ReportCard id={id} title={title} content={content} isDraft={isDraft} />
     </Box>
   );
 };

@@ -4,6 +4,7 @@ import {
   createReport,
   updateReport,
   patchReport,
+  getReportById,
 } from "../api/reportsApi";
 import type { Report } from "../types/types";
 import { QUERY_KEYS } from "../constants/cache-eviction";
@@ -29,8 +30,24 @@ export const usePatchReport = () =>
     mutationFn: ({ id, fields }: { id: string; fields: Partial<Report> }) =>
       patchReport(id, fields),
   });
-
+export const useGetReport = (id?: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.REPORT, id],
+    queryFn: () => getReportById(id!),
+    enabled: !!id,
+  });
 export const useInvalidateReportsCache = () => {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.REPORTS] });
+
+  return (reportId?: string) => {
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.REPORTS],
+    });
+
+    if (reportId) {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.REPORT, reportId],
+      });
+    }
+  };
 };

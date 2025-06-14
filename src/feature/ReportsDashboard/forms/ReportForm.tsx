@@ -1,20 +1,33 @@
 import React from "react";
-import { Box, Button, TextField, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  CircularProgress,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RichTextEditor from "../../../ui/components/RichTextEditor";
 import type { ReportFormProps } from "../../../types/types";
 
+// Schema
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
+  isDraft: z.boolean(),
 });
 
 export type ReportFormValues = z.infer<typeof schema>;
 
 const ReportForm: React.FC<ReportFormProps> = ({
-  defaultValues = {},
+  defaultValues = {
+    title: "",
+    content: "",
+    isDraft: false,
+  },
   onSubmit,
   submitLabel = "Submit",
   handleClose,
@@ -55,6 +68,22 @@ const ReportForm: React.FC<ReportFormProps> = ({
                 </Box>
               )}
             </>
+          )}
+        />
+
+        <Controller
+          name="isDraft"
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={!!field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                />
+              }
+              label="Mark as draft"
+            />
           )}
         />
 

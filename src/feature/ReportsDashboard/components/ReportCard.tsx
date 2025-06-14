@@ -8,30 +8,26 @@ import {
   useTheme,
   Paper,
   Box,
+  Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import ExpandMoreIcon from "@mui/icons-material/Visibility";
-import { useModal } from "../../../context/ModalContext";
 import type { ReportCardProps } from "../../../types/types";
-import { useSummarizeContent } from "../../../hooks/useOpenApi";
+import { useNavigate } from "react-router-dom";
+import { REPORT_ROUTES } from "../../../constants/routes";
 
 const ReportCard: React.FC<ReportCardProps> = ({
   title,
   content,
-  onEdit,
   id,
+  isDraft,
 }) => {
   const theme = useTheme();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
-  const {
-    openShowMoreModal,
-    setIsSummaryLoading,
-    setModalContent,
-    openSummaryModal,
-  } = useModal();
-  const { mutateAsync: summarize } = useSummarizeContent();
+  const navigate = useNavigate();
+
   useLayoutEffect(() => {
     const el = contentRef.current;
     if (el) {
@@ -50,6 +46,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
         flexDirection: "column",
         borderRadius: 2,
         overflow: "hidden",
+        position: "relative",
       }}
     >
       <Card
@@ -60,8 +57,17 @@ const ReportCard: React.FC<ReportCardProps> = ({
           flexDirection: "column",
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "row", padding: 2, gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: 2,
+          }}
+        >
           <Typography variant="h6">{title}</Typography>
+          {isDraft && <Chip label="Draft" color="info" />}
         </Box>
 
         <CardContent
@@ -93,13 +99,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
             flexDirection: "column",
           }}
         >
-          <Box
-            sx={{
-              textAlign: "center",
-              width: "100%",
-            }}
-          >
-            {" "}
+          <Box sx={{ textAlign: "center", width: "100%" }}>
             {isOverflowing && (
               <Button
                 variant="text"
@@ -108,11 +108,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                 startIcon={<ExpandMoreIcon />}
                 onClick={(e) => {
                   e.stopPropagation();
-                  openShowMoreModal({
-                    modalTitle: title,
-                    content,
-                    reportId: id,
-                  });
+                  navigate(REPORT_ROUTES.SHOW_MORE(id));
                 }}
               >
                 Show more
@@ -134,7 +130,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
               startIcon={<EditIcon />}
               onClick={(e) => {
                 e.stopPropagation();
-                onEdit(title, content, id);
+                navigate(REPORT_ROUTES.DETAIL(id));
               }}
             >
               Edit
@@ -143,37 +139,9 @@ const ReportCard: React.FC<ReportCardProps> = ({
               onPointerDown={(e) => e.preventDefault()}
               variant="contained"
               startIcon={<SummarizeIcon />}
-              onClick={async (e) => {
+              onClick={(e) => {
                 e.stopPropagation();
-
-                const modalTitle = `Summary of report${title}`;
-
-                // Step 1: Open modal with loading state
-                openSummaryModal({
-                  modalTitle,
-                  title: modalTitle,
-                  content: "", // initially empty
-                  reportId: id,
-                });
-
-                setIsSummaryLoading(true);
-                setModalContent(""); // optional: reset content
-
-                try {
-                  // Step 2: Fetch summary
-                  const result = await summarize({ title, content });
-
-                  // Step 3: Update modal with summarized content
-                  setModalContent(result.choices[0].message.content);
-                } catch (err) {
-                  console.error("Failed to summarize", err);
-                  setModalContent(
-                    "<p style='color:red;'>Failed to summarize report.</p>"
-                  );
-                } finally {
-                  // Step 4: Stop loading
-                  setIsSummaryLoading(false);
-                }
+                navigate(REPORT_ROUTES.SUMMARIZE_REPORT(id));
               }}
             >
               Summarize

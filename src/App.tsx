@@ -1,14 +1,15 @@
-import MainLayout from "./ui/layout/MainLayout";
-import ReportsDashboard from "./feature/ReportsDashboard/components/ReportsDashboard";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRoutes } from "react-router-dom";
+import mainRoutes from "./app.routes";
 
 const App = () => {
+  const routing = useRoutes(mainRoutes);
   return (
-    <MainLayout>
-      <ReportsDashboard />
+    <>
+      {routing}
       <ToastContainer position="top-right" autoClose={3000} />
-    </MainLayout>
+    </>
   );
 };
 

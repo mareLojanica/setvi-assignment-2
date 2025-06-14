@@ -1,37 +1,54 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FC,
+  type PropsWithChildren,
+} from "react";
 import { debounce } from "lodash";
 import { ReportsContext } from "../context/ReportsContext";
 import { useGetReports } from "../hooks/useReportsApi";
-
 import type { DragEndEvent } from "@dnd-kit/core";
 import { reorderItemsById } from "../utils/dnd.utils";
 import type { Report } from "../types/types";
+import { Outlet, useNavigate } from "react-router-dom";
 
-export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { data: initialReports = [], isLoading: isLoadingGetReports } =
-    useGetReports();
+export const ReportsProvider: FC<PropsWithChildren> = () => {
+  const {
+    data: initialReports = [],
+    isLoading: isLoadingGetReports,
+    isError,
+  } = useGetReports();
 
-  const [reports, setReports] = useState<Report[]>(initialReports);
+  const navigate = useNavigate();
+  const hasRedirectedRef = useRef(false);
+
+  const [reports, setReports] = useState<Report[]>([]);
   const [filter, setFilter] = useState("");
-  const [filteredReports, setFilteredReports] =
-    useState<Report[]>(initialReports);
+  const [filteredReports, setFilteredReports] = useState<Report[]>([]);
 
-  const reorderReports = useCallback(
-    (e: DragEndEvent) => {
-      if (!e.over || e.active.id === e.over.id) return;
-
-      setFilteredReports((prev) =>
-        reorderItemsById(prev, e.active.id, e.over!.id)
-      );
-    },
-    [setFilteredReports]
-  );
   useEffect(() => {
-    setReports(initialReports);
-    setFilteredReports(initialReports);
-  }, [initialReports]);
+    if (isError && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
+      navigate("/server-offline");
+    }
+  }, [isError, navigate]);
+
+  useEffect(() => {
+    if (!isError && initialReports.length > 0) {
+      setReports(initialReports);
+      setFilteredReports(initialReports);
+    }
+  }, [initialReports, isError]);
+
+  const reorderReports = useCallback((e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    setFilteredReports((prev) =>
+      reorderItemsById(prev, e.active.id, e.over!.id)
+    );
+  }, []);
 
   const debouncedFilterReports = useMemo(
     () =>
@@ -47,14 +64,10 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     debouncedFilterReports(filter, reports);
-    return () => {
-      debouncedFilterReports.cancel();
-    };
+    return () => debouncedFilterReports.cancel();
   }, [filter, reports, debouncedFilterReports]);
 
-  const onFilterChange = (value: string) => {
-    setFilter(value);
-  };
+  const onFilterChange = (value: string) => setFilter(value);
 
   const value = useMemo(
     () => ({
@@ -70,6 +83,8 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   return (
-    <ReportsContext.Provider value={value}>{children}</ReportsContext.Provider>
+    <ReportsContext.Provider value={value}>
+      <Outlet />
+    </ReportsContext.Provider>
   );
 };

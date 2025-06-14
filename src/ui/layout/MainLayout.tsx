@@ -1,7 +1,8 @@
 import { Box } from "@mui/material";
-import React, { type FC, type PropsWithChildren } from "react";
+import React, { type FC } from "react";
+import { Outlet } from "react-router-dom";
 
-const MainLayout: FC<PropsWithChildren> = ({ children }) => {
+const MainLayout: FC = () => {
   return (
     <Box
       component="main"
@@ -14,7 +15,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         p: 4,
       }}
     >
-      {children}
+      <Outlet />
     </Box>
   );
 };

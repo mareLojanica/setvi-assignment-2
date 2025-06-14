@@ -28,7 +28,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       )}
 
       <Editor
-        apiKey={import.meta.env.VITE_API_KEY}
+        apiKey={import.meta.env.VITE_TINY_MCE_KEYAPI_KEY}
         init={{
           height: 300,
           menubar: false,

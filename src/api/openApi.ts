@@ -1,4 +1,5 @@
 import { ENDPOINTS } from "../constants/endpoints";
+import { SUMMARIZE_PROMPT } from "../constants/prompts";
 import type {
   ChatCompletionRequest,
   ChatCompletionResponse,
@@ -7,7 +8,8 @@ import { openaiApi } from "./openApiClient";
 
 export const summarizeContent = async (
   title: string,
-  content: string
+  content: string,
+  prompt: string = SUMMARIZE_PROMPT
 ): Promise<ChatCompletionResponse> => {
   const request: ChatCompletionRequest = {
     model: "gpt-4o-mini",
@@ -15,15 +17,12 @@ export const summarizeContent = async (
     messages: [
       {
         role: "user",
-        content: `Summarize the following report, which includes a title and rich text content. The content may contain HTML tags, headings, lists, and formatting. Keep the tone and structure, return a clear and concise summary in **markdown**, not HTML. Do not copy text verbatim.\n\nTitle: ${title}\n\nContent:\n${content}`,
+        content: `${prompt}\n\nTitle: ${title}\n\nContent:\n${content}`,
       },
     ],
   };
 
-  const { data } = await openaiApi.post<ChatCompletionResponse>(
-    ENDPOINTS.OPENAI_CHAT_COMPLETION,
-    request
-  );
+  const { data } = await openaiApi.post(ENDPOINTS.OPENAI_CHAT_COMPLETION, request);
   return data;
 };
 export const draftContent = async (

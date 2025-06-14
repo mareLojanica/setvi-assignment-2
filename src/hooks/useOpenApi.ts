@@ -4,9 +4,8 @@ import type { ChatCompletionResponse, DraftContentInput } from "../types/types";
 
 
 export const useSummarizeContent = () =>
-  useMutation({
-    mutationFn: ({ title, content }: { title: string; content: string }) =>
-      summarizeContent(title, content),
+  useMutation<ChatCompletionResponse, Error, { title: string; content: string }>({
+    mutationFn: ({ title, content }) => summarizeContent(title, content),
   });
 
   export const useDraftContent = () =>

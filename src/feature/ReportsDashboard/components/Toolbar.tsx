@@ -2,13 +2,15 @@ import React, { type FC } from "react";
 import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useReports } from "../../../context/ReportsContext";
-import { useModal } from "../../../context/ModalContext";
+import { useNavigate } from "react-router-dom";
+import { REPORT_ROUTES } from "../../../constants/routes";
 
 const ToolbarBar: FC = () => {
   const theme = useTheme();
   const { onFilterChange, filter } = useReports();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { openDraftModal, openCreateNewReportModal } = useModal();
+  const navigate = useNavigate();
+
   return (
     <Box
       role="search"
@@ -47,11 +49,7 @@ const ToolbarBar: FC = () => {
           startIcon={<AddIcon />}
           aria-label="Create new report"
           sx={{ width: isMobile ? "100%" : "auto" }}
-          onClick={() =>
-            openCreateNewReportModal({
-              modalTitle: "Create a new report ",
-            })
-          }
+          onClick={() => navigate(REPORT_ROUTES.CREATE)}
         >
           Create New Report
         </Button>
@@ -60,11 +58,7 @@ const ToolbarBar: FC = () => {
           startIcon={<AddIcon />}
           aria-label="Create draft report"
           sx={{ width: isMobile ? "100%" : "auto" }}
-          onClick={() =>
-            openDraftModal({
-              modalTitle: "Create a Draft version of report using OpenAi",
-            })
-          }
+          onClick={() => navigate(REPORT_ROUTES.GENERATE_DRAFT)}
         >
           Create Draft
         </Button>

@@ -1,48 +1,24 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { QUERY_KEYS } from "../constants/cache-eviction";
+import type { SubmitHandler } from "react-hook-form";
+
+import type { SxProps, Theme } from "@mui/material";
 
 export type Report = {
   id: string;
   title: string;
   content: string;
   timestamp: string;
+  isDraft: boolean;
 };
 
 export type ReportFormValues = {
   title: string;
   content: string;
+  isDraft: boolean;
 };
 
-export type ModalPayload = {
-  modalTitle?: string;
-  title?: string;
-  content?: string;
-  reportId?: string;
-};
-
-export const ModalType = {
-  EditReport: "edit-report",
-  CreateSummary: "create-summary",
-  CreateDraft: "create-draft",
-  ShowMore: "show-more",
-  CreateNewReport: "create-new-report",
-} as const;
-
-export type ModalType = (typeof ModalType)[keyof typeof ModalType];
-
-export type ModalContextType = {
-  modalState: ModalState;
-  closeModal: () => void;
-  openDraftModal: (data?: ModalPayload) => void;
-  openEditModal: (data?: ModalPayload) => void;
-  openSummaryModal: (data?: ModalPayload) => void;
-  openShowMoreModal: (data?: ModalPayload) => void;
-  openCreateNewReportModal: (data?: ModalPayload) => void;
-  isSummaryLoading: boolean;
-  setIsSummaryLoading: Dispatch<SetStateAction<boolean>>;
-  setModalContent: (content: string) => void;
-};
 
 export type ModalConfig = {
   title: string;
@@ -67,19 +43,9 @@ export type ReportCardProps = {
   id: string;
   title: string;
   content: string;
-  onEdit: (title: string, content: string, reportId: string) => void;
-  onSummarize: (modalTitle: string) => void;
+  isDraft: boolean;
 };
 
-export type ReportModalsProps = {
-  open: boolean;
-  type: ModalType;
-  title?: string;
-  content?: string;
-  onClose: () => void;
-  modalTitle: string;
-  reportId?: string;
-};
 
 export type UpdateReportModalProps = {
   open: boolean;
@@ -90,8 +56,8 @@ export type UpdateReportModalProps = {
 };
 
 export type ReportFormProps = {
-  defaultValues?: Partial<ReportFormValues>;
-  onSubmit: (data: ReportFormValues) => Promise<void>;
+  defaultValues?: ReportFormValues;
+  onSubmit: SubmitHandler<ReportFormValues>;
   submitLabel?: string;
   handleClose: () => void;
   isLoading?: boolean;
@@ -102,10 +68,6 @@ export type RichTextEditorProps = {
   onChange: (content: string) => void;
 };
 
-export type ModalState = {
-  type: ModalType | null;
-  data?: ModalPayload;
-};
 export type QueryKey = (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS];
 
 export type ChatMessage = {
@@ -148,8 +110,7 @@ export type ChatCompletionResponse = {
 export type DraggableCardProps = {
   title: string;
   content: string;
-  onSummarize: (modalTitle: string) => void;
-  onEdit: (title: string, content: string, reportId: string) => void;
+  isDraft: boolean;
   id: string;
 };
 
@@ -161,5 +122,20 @@ export type ContentModalProps = {
 };
 export type DraftContentInput = {
   title: string;
+  content: string;
+};
+
+export type PreviewLayoutProps = {
+  title?: string;
+  children: React.ReactNode;
+  backButtonOptions?: BackButtonOptions;
+  sx?: SxProps<Theme>;
+};
+
+export type BackButtonOptions = {
+  navigateTo: () => void;
+  label?: string;
+};
+export type MarkdownRendererProps = {
   content: string;
 };
